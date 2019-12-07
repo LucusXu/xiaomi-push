@@ -1,5 +1,5 @@
 # xmpush
-小米推送服务 Golang SDK
+Xiaomi Push Golang SDK
 
 Production ready, full golang implementation of Xiaomi Push API (http://dev.xiaomi.com/console/?page=appservice&mod=push)
 
