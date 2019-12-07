@@ -1,4 +1,4 @@
-package xiaomipush
+package xmpush
 
 const (
 	ProductionHost = "https://api.xmpush.xiaomi.com"
@@ -19,13 +19,13 @@ const (
 	ScheduleJobExistURL                  = "/v2/schedule_job/exist"           // 检测定时消息的任务是否存在。
 	ScheduleJobDeleteURL                 = "/v2/schedule_job/delete"          // 删除指定的定时消息。
 	ScheduleJobDeleteByJobKeyURL         = "/v3/schedule_job/delete"          // 删除指定的定时消息。
-
 )
 
 const (
-	StatsURL          = "/v1/stats/message/counters" // 统计push
-	MessageStatusURL  = "/v1/trace/message/status"   // 获取指定ID的消息状态
-	MessagesStatusURL = "/v1/trace/messages/status"  // 获取某个时间间隔内所有消息的状态
+	StatsURL          		= "/v1/stats/message/counters" // 统计push
+	MessageStatusURL  		= "/v1/trace/message/status"   // 获取指定ID的消息状态
+	MessagesStatusURL 		= "/v1/trace/messages/status"  // 获取某个时间间隔内所有消息的状态
+	MultiMessagesStatusURL 	= "/v1/trace/multi_message/status"
 )
 
 const (

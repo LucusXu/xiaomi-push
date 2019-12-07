@@ -1,4 +1,4 @@
-package xiaomipush
+package xmpush
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ type Message struct {
 
 const (
 	MaxTimeToSend = time.Hour * 24 * 7
-	MaxTimeToLive = time.Hour * 24 * 7 * 2
+	MaxTimeToLive = 24 * 7 * 2 * 3600 * 1000
 )
 
 func (m *Message) SetRestrictedPackageName(restrictedPackageNames []string) *Message {
@@ -50,8 +50,8 @@ func (m *Message) SetTimeToSend(tts int64) *Message {
 }
 
 func (m *Message) SetTimeToLive(ttl int64) *Message {
-	if time.Since(time.Unix(0, ttl*int64(time.Millisecond))) > MaxTimeToLive {
-		m.TimeToLive = time.Now().Add(MaxTimeToLive).UnixNano() / 1e6
+	if ttl > MaxTimeToLive {
+		m.TimeToLive = MaxTimeToLive
 	} else {
 		m.TimeToLive = ttl
 	}
@@ -85,7 +85,8 @@ func (m *Message) SetJobKey(jobKey string) *Message {
 // 小米推送服务器每隔1s将已送达或已点击的消息ID和对应设备的regid或alias通过调用第三方http接口传给开发者。
 func (m *Message) SetCallback(callbackURL string) *Message {
 	m.Extra["callback"] = callbackURL
-	m.Extra["callback.type"] = "3" // 1:送达回执, 2:点击回执, 3:送达和点击回执
+	// 1:送达回执, 2:点击回执, 3:送达和点击回执, 16:无法找到目标设备时发送回执 17:如果既需要收到送达回执，也需要收到找不到目标设备的回执
+	m.Extra["callback.type"] = "17"
 	return m
 }
 

@@ -1,4 +1,4 @@
-package xiaomipush
+package xmpush
 
 import (
 	"encoding/json"
@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 )
@@ -44,8 +43,7 @@ func (m *MiPush) Send(ctx context.Context, msg *Message, regID string) (*SendRes
 	return &result, nil
 }
 
-// 根据regIds，发送消息到指定的一组设备上
-// regIds的个数不得超过1000个。
+// CORE 根据regIds，发送消息到指定的一组设备上 regIds的个数不得超过1000个
 func (m *MiPush) SendToList(ctx context.Context, msg *Message, regIDList []string) (*SendResult, error) {
 	if len(regIDList) == 0 || len(regIDList) > 1000 {
 		panic("wrong number regIDList")
@@ -320,6 +318,21 @@ func (m *MiPush) GetMessageStatusPeriod(ctx context.Context, beginTime, endTime 
 	return &result, nil
 }
 
+// 批量查询统计结果
+func (m *MiPush) MultiGetMessageStatus(ctx context.Context, msgIds string) (*MultiStatsResult, error) {
+	params := m.assembleMultiMsgIds(msgIds)
+	bytes, err := m.doPost(ctx, m.host + MultiMessagesStatusURL, params)
+	if err != nil {
+		return nil, err
+	}
+	var result MultiStatsResult
+	err = json.Unmarshal(bytes, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 //----------------------------------------Subscription----------------------------------------//
 
 // 给某个regid订阅标签
@@ -540,6 +553,12 @@ func (m *MiPush) assembleStatusByJobKeyParams(jobKey string) string {
 	return "?" + form.Encode()
 }
 
+func (m *MiPush) assembleMultiMsgIds(msgIds string) url.Values {
+	form := url.Values{}
+	form.Add("msg_ids", msgIds)
+	return form
+}
+
 func (m *MiPush) assembleStatusPeriodParams(beginTime, endTime int64) string {
 	form := url.Values{}
 	form.Add("begin_time", strconv.FormatInt(int64(beginTime), 10))
@@ -642,12 +661,12 @@ tryAgain:
 		panic("xiaomi response is nil")
 	}
 	defer res.Body.Close()
-	fmt.Println("res.StatusCode=", res.StatusCode)
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("network error")
+		return nil, errors.New("network error," + strconv.Itoa(res.StatusCode))
 	}
 	result, err = ioutil.ReadAll(res.Body)
 	if err != nil {
+		fmt.Println("xiaomi push post ioutil.ReadAll err:", err)
 		return nil, err
 	}
 	return result, nil
@@ -672,7 +691,7 @@ func (m *MiPush) doGet(ctx context.Context, url string, params string) ([]byte, 
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("network error")
+		return nil, errors.New("network error" + strconv.Itoa(res.StatusCode))
 	}
 	result, err = ioutil.ReadAll(res.Body)
 	if err != nil {
