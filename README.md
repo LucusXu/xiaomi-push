@@ -1,10 +1,10 @@
-# xiaomi-push
+# xmpush
 小米推送服务 Golang SDK
 
 Production ready, full golang implementation of Xiaomi Push API (http://dev.xiaomi.com/console/?page=appservice&mod=push)
 
 ```Go
-var client = xiaomipush.NewClient("yourappSecret", []string{"packageName"})
+var client = xmpush.NewClient("yourappSecret", []string{"packageName"})
 
 func main() {
     var msg1 *Message = xiaomipush.NewAndroidMessage("title", "body").SetPayload("this is payload1")
